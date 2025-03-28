@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form as FormRoot, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+import { Control, useForm } from "react-hook-form";
 import { FormProps } from "@/types/flowJSON";
 import RadioButtonsGroupField from "./RadioButtonsGroup";
 import CheckboxGroupField from "./CheckboxGroup";
@@ -15,7 +15,7 @@ interface DropdownProps {
   name: string;
   label: string;
   required: boolean;
-  control: any;
+  control: Control;
   dataSource: Array<{
     id: string;
     title: string;
@@ -185,7 +185,6 @@ const Form: React.FC<FormProps> = ({ formData, screenData, onComplete }) => {
                 name={child.name || `radio_group_${index}`}
                 label={child.label}
                 description={child.description}
-                // @ts-ignore
                 items={Object.entries(screenData!)[0][1].__example__}
                 required={child.required}
                 onSelectAction={child["on-select-action"]}

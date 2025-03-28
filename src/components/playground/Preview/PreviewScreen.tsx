@@ -20,7 +20,7 @@ const ScreenPreview: React.FC<ScreenPreviewProps> = ({
 
   const handleMenuClick = () => {
     if (menuButtonRef.current) {
-      // @ts-ignore
+      // @ts-expect-error
       const rect = menuButtonRef.current.getBoundingClientRect();
       setMenuPosition({
         x: 10,
@@ -34,7 +34,7 @@ const ScreenPreview: React.FC<ScreenPreviewProps> = ({
     setContextMenuOpen(false);
   };
 
-  const processTextContent = (text: string | string[] | undefined, useMarkdown: boolean = false): string => {
+  const processTextContent = (text: string | string[] | undefined): string => {
     if (!text) return '';
     if (Array.isArray(text)) {
       return text.join('\n');
@@ -56,9 +56,8 @@ const ScreenPreview: React.FC<ScreenPreviewProps> = ({
         );
       case "ChipsSelector":
         return (
-          // @ts-ignore
-          <ChipsSelector 
-            name={child.name!}
+          // @ts-expect-error
+          <ChipsSelector
             label={child.label}
             description={child.description}
             max-selected-items={child["max-selected-items"]}
@@ -68,7 +67,7 @@ const ScreenPreview: React.FC<ScreenPreviewProps> = ({
       case "TextHeading":
         return child.markdown ? (
           <div className="text-xl font-bold mb-4">
-            <ReactMarkdown>{processTextContent(child.text, true)}</ReactMarkdown>
+            <ReactMarkdown>{processTextContent(child.text)}</ReactMarkdown>
           </div>
         ) : (
           <h1 className="text-xl font-bold mb-4">{processTextContent(child.text)}</h1>
@@ -76,7 +75,7 @@ const ScreenPreview: React.FC<ScreenPreviewProps> = ({
       case "TextSubheading":
         return child.markdown ? (
           <div className="text-lg font-semibold mb-3">
-            <ReactMarkdown>{processTextContent(child.text, true)}</ReactMarkdown>
+            <ReactMarkdown>{processTextContent(child.text)}</ReactMarkdown>
           </div>
         ) : (
           <h2 className="text-lg font-semibold mb-3">{processTextContent(child.text)}</h2>
@@ -84,7 +83,7 @@ const ScreenPreview: React.FC<ScreenPreviewProps> = ({
       case "TextBody":
         return child.markdown ? (
           <div className="text-base mb-3">
-            <ReactMarkdown>{processTextContent(child.text, true)}</ReactMarkdown>
+            <ReactMarkdown>{processTextContent(child.text)}</ReactMarkdown>
           </div>
         ) : (
           <p className="text-base mb-3">{processTextContent(child.text)}</p>
@@ -92,7 +91,7 @@ const ScreenPreview: React.FC<ScreenPreviewProps> = ({
       case "TextCaption":
         return child.markdown ? (
           <div className="text-sm text-gray-500 mb-2">
-            <ReactMarkdown>{processTextContent(child.text, true)}</ReactMarkdown>
+            <ReactMarkdown>{processTextContent(child.text)}</ReactMarkdown>
           </div>
         ) : (
           <p className="text-sm text-gray-500 mb-2">{processTextContent(child.text)}</p>
@@ -101,7 +100,7 @@ const ScreenPreview: React.FC<ScreenPreviewProps> = ({
         return (
           <div className="mb-4 overflow-x-auto">
             <ReactMarkdown>
-              {processTextContent(child.text, true)}
+              {processTextContent(child.text)}
             </ReactMarkdown>
           </div>
         );

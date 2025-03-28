@@ -1,7 +1,7 @@
 import { ContextMenuProps } from "@/types/flowJSON";
 import { Flag, HelpCircle } from "lucide-react";
 
-const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, onClose, position }) => {
+const ContextMenu: React.FC<ContextMenuProps> = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (

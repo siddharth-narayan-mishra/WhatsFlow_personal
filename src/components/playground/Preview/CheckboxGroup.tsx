@@ -2,6 +2,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { CheckboxItem } from "@/types/flowJSON";
+import { Control } from "react-hook-form";
+
+type CheckboxGroupFieldProps = {
+  control: Control;
+  name: string;
+  label: string;
+  description?: string;
+  items: CheckboxItem[];
+  required?: boolean;
+};
 
 const CheckboxGroupField = ({
   control,
@@ -10,7 +20,7 @@ const CheckboxGroupField = ({
   description,
   items,
   required
-}:any) => {
+}: CheckboxGroupFieldProps) => {
   return (
     <div className="space-y-3 mb-6">
       <div className="flex flex-col space-y-1">
@@ -24,9 +34,9 @@ const CheckboxGroupField = ({
         name={name}
         rules={{ required: required }}
         defaultValue={[]}
-        render={({ field }:{field:any}) => (
+        render={({ field }: { field: any }) => (
           <div className="space-y-1">
-            {items.map((item:CheckboxItem) => (
+            {items.map((item: CheckboxItem) => (
               <FormItem
                 key={item.id}
                 className="flex flex-row items-start space-x-3 space-y-0 py-2 border-b border-gray-100 last:border-0"
@@ -34,11 +44,11 @@ const CheckboxGroupField = ({
                 <FormControl>
                   <Checkbox
                     checked={(field.value || []).includes(item.id)}
-                    onCheckedChange={(checked:any) => {
+                    onCheckedChange={(checked: any) => {
                       const currentValue = field.value || [];
                       const updatedValue = checked
                         ? [...currentValue, item.id]
-                        : currentValue.filter((value:any) => value !== item.id);
+                        : currentValue.filter((value: any) => value !== item.id);
                       field.onChange(updatedValue);
                     }}
                     className="text-emerald-600"

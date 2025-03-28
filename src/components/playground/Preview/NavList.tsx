@@ -1,7 +1,26 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 
-const NavigationList = ({ name, listItems }:any) => {
+// Define a type for the list item structure
+type ListItemContent = {
+    title?: string;
+    metadata?: string;
+    description?: string;
+};
+
+type NavigationListItem = {
+    id: string | number;
+    "main-content"?: ListItemContent;
+    end?: ListItemContent;
+};
+
+// Define props type
+type NavigationListProps = {
+    name: string | undefined;
+    listItems: NavigationListItem[] | undefined;
+};
+
+const NavigationList = ({ name, listItems }:NavigationListProps) => {
     if (!listItems || listItems.length === 0) {
         return null;
     }

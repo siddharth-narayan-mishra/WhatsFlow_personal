@@ -2,8 +2,19 @@ import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/for
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CheckboxItem } from "@/types/flowJSON";
+import { Control, FieldValues, Path } from "react-hook-form";
 
-const RadioButtonsGroupField = ({
+type RadioButtonsGroupFieldProps<TFieldValues extends FieldValues> = {
+    control: Control<TFieldValues>;
+    name: Path<TFieldValues>;
+    label: string;
+    description?: string;
+    items: CheckboxItem[];
+    required?: boolean;
+    onSelectAction?: (value: string) => void;
+};
+
+const RadioButtonsGroupField = <TFieldValues extends FieldValues>({
     control,
     name,
     label,
@@ -11,7 +22,7 @@ const RadioButtonsGroupField = ({
     items,
     required,
     onSelectAction
-}: any) => {
+}: RadioButtonsGroupFieldProps<TFieldValues>) => {
     return (
         <div className="space-y-3 mb-6">
             <div className="flex flex-col space-y-1">
@@ -29,23 +40,29 @@ const RadioButtonsGroupField = ({
                         <RadioGroup
                             className="space-y-1"
                             value={field.value}
-                            onValueChange={(value:any) => {
+                            onValueChange={(value: string) => {
                                 field.onChange(value);
                                 if (onSelectAction) {
-                                    // Handle on-select-action if needed
-                                    console.log("Selected value:", value, "Action:", onSelectAction);
+                                    onSelectAction(value);
                                 }
                             }}
                         >
-                            {items.map((item: CheckboxItem) => (
+                            {items.map((item) => (
                                 <FormItem
                                     key={item.id}
                                     className="flex items-center space-x-3 space-y-0 py-2 border-b border-gray-100 last:border-0"
                                 >
                                     <FormControl>
-                                        <RadioGroupItem value={item.id} id={`radio-${name}-${item.id}`} className="text-emerald-600" />
+                                        <RadioGroupItem
+                                            value={item.id}
+                                            id={`radio-${name}-${item.id}`}
+                                            className="text-emerald-600"
+                                        />
                                     </FormControl>
-                                    <FormLabel htmlFor={`radio-${name}-${item.id}`} className="font-normal">
+                                    <FormLabel
+                                        htmlFor={`radio-${name}-${item.id}`}
+                                        className="font-normal"
+                                    >
                                         {item.title}
                                     </FormLabel>
                                 </FormItem>
@@ -58,4 +75,4 @@ const RadioButtonsGroupField = ({
     );
 };
 
-export default RadioButtonsGroupField
+export default RadioButtonsGroupField;

@@ -1,32 +1,38 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { OptInProps } from "@/types/flowJSON";
+import { Control, FieldValues, Path } from "react-hook-form";
 
-const OptIn: React.FC<OptInProps> = ({
+// Modify the type to be more generic and support different form value types
+const OptIn = <TFieldValues extends FieldValues>({
     control,
     name,
     label,
     required,
     onClickAction
+}: {
+    control: Control<TFieldValues>;
+    name: Path<TFieldValues>;
+    label: string;
+    required?: boolean;
+    onClickAction?: () => void;
 }) => {
-    let displayLabel = label;
-
+    const displayLabel = label;
     return (
         <FormField
             control={control}
             name={name}
             rules={{ required: required }}
-            defaultValue={false}
-            render={({ field }:{field:any}) => (
+            render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 py-2 mb-3">
                     <FormControl>
                         <Checkbox
                             checked={field.value || false}
-                            onCheckedChange={(checked:any) => {
+                            onCheckedChange={(checked: boolean) => {
                                 field.onChange(checked);
                                 if (checked && onClickAction) {
                                     // Handle on-click-action if needed
-                                    console.log("OptIn checked, Action:", onClickAction);
+                                    onClickAction();
                                 }
                             }}
                             className="text-emerald-600 mt-1"

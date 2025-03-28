@@ -1,11 +1,12 @@
+import React from "react";
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { ScreenSelectorProps } from "@/types/flowJSON";
 
@@ -16,7 +17,10 @@ const ScreenSelector: React.FC<ScreenSelectorProps> = ({
 }) => {
   return (
     <div className="mb-4 w-full max-w-md mx-auto">
-      <Select value={currentScreenIndex.toString()} onValueChange={(value:any) => onSelectScreen(parseInt(value))}>
+      <Select
+        value={currentScreenIndex.toString()}
+        onValueChange={(value: string) => onSelectScreen(parseInt(value, 10))}
+      >
         <SelectTrigger className="w-full bg-white border-gray-300">
           <SelectValue placeholder="Select a screen">
             {screens[currentScreenIndex].title}
@@ -42,4 +46,4 @@ const ScreenSelector: React.FC<ScreenSelectorProps> = ({
   );
 };
 
-export default ScreenSelector
+export default ScreenSelector;

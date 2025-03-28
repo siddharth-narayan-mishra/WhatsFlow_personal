@@ -4,7 +4,6 @@ import { Check } from "lucide-react";
 import { ChipsSelectorProps } from "@/types/flowJSON";
 
 const ChipsSelector: React.FC<ChipsSelectorProps> = ({
-    name,
     label,
     description,
     "max-selected-items": maxSelectedItems = Infinity,

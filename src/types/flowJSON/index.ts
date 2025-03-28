@@ -145,7 +145,6 @@ export interface ChipItem {
 }
 
 export interface ChipsSelectorProps {
-    name: string;
     label?: string;
     description?: string;
     "max-selected-items"?: number;
