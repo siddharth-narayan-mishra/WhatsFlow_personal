@@ -1,6 +1,8 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ContextMenu from '@/lib/flow/ContextMenu';
 import { nodeTypes, edgeTypes, ReactFlowContextMenuProps as MenuProps } from '@/types/react-flow';
 import { getLayoutedElements } from '@/lib/dagre';
@@ -22,14 +24,12 @@ import {
     Edge,
 } from '@xyflow/react';
 
-// Define a more specific type for nodes
 type CustomNode = Node & {
     data: {
         label: string;
     };
 };
 
-// Define a more specific type for edges
 type CustomEdge = Edge & {
     label?: string;
 };
@@ -40,10 +40,10 @@ export default function LayoutFlow() {
     const [edges, setEdges, onEdgesChange] = useEdgesState<CustomEdge>([]);
     const [layoutDirection, setLayoutDirection] = useState<'TB' | 'LR'>('TB');
     const [menu, setMenu] = useState<MenuProps | null>(null);
+    const [jsonInput, setJsonInput] = useState<string>('');
     const ref = useRef<HTMLDivElement | null>(null);
     const isInitialRender = useRef(true);
 
-    // load data from localStorage on first render
     useEffect(() => {
         try {
             const savedData = localStorage.getItem('flowData');
@@ -56,7 +56,6 @@ export default function LayoutFlow() {
                     setEdges(savedEdges as CustomEdge[]);
                 }
 
-                // Only apply layout on initial render if we have nodes
                 if (savedNodes && savedNodes.length > 0) {
                     setTimeout(() => {
                         const layouted = getLayoutedElements(savedNodes, savedEdges, { direction: layoutDirection });
@@ -76,17 +75,14 @@ export default function LayoutFlow() {
         isInitialRender.current = false;
     }, []);
 
-    // save to localStorage when nodes or edges change
     useEffect(() => {
         if (!isInitialRender.current) {
             localStorage.setItem('flowData', JSON.stringify({ nodes, edges }));
         }
     }, [nodes, edges]);
 
-    // Handler for when users manually connect nodes
     const onConnect: OnConnect = useCallback(
         (connection) => {
-            // Create a new edge with a label
             const newEdge: CustomEdge = {
                 ...connection,
                 id: `edge_${connection.source}_${connection.target}`,
@@ -116,24 +112,21 @@ export default function LayoutFlow() {
 
         const newNode: CustomNode = {
             id: newNodeId,
-            type: 'custom', // Use the custom node type
+            type: 'custom',
             position: position,
             data: {
                 label: `Node ${nodes.length + 1}`
             }
         };
 
-        // update state with the new node without creating any edges
         const updatedNodes = [...nodes, newNode];
         setNodes(updatedNodes);
 
-        // save to localStorage
         localStorage.setItem('flowData', JSON.stringify({
             nodes: updatedNodes,
             edges: edges
         }));
 
-        //fit view to show the new node
         setTimeout(() => {
             fitView({ padding: 0.2 });
         }, 50);
@@ -143,6 +136,7 @@ export default function LayoutFlow() {
         setNodes([]);
         setEdges([]);
         localStorage.removeItem('flowData');
+        setJsonInput('');
     }, [setNodes, setEdges]);
 
     const toggleLayout = useCallback(() => {
@@ -152,12 +146,9 @@ export default function LayoutFlow() {
 
     const onNodeContextMenu: NodeMouseHandler = useCallback(
         (event, node) => {
-            // Prevent native context menu from showing
             event.preventDefault();
 
             if (ref.current) {
-                // Calculate position of the context menu. We want to make sure it
-                // doesn't get positioned off-screen.
                 const pane = ref.current.getBoundingClientRect();
                 setMenu({
                     id: node.id,
@@ -173,46 +164,91 @@ export default function LayoutFlow() {
 
     const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
 
-    // Update existing nodes to use the custom type if they don't already have it
-    useEffect(() => {
-        if (!isInitialRender.current && nodes.length > 0) {
-            setNodes(nodes.map((node) => ({
-                ...node,
-                type: node.type || 'custom'
-            })) as CustomNode[]);
+    const renderJsonFlow = useCallback(() => {
+        try {
+            const parsedData = JSON.parse(jsonInput);
+            const nodesData = parsedData.nodes || [];
+            const edgesData = parsedData.edges || [];
+
+            const transformedNodes = nodesData.map((node: any, index: number) => ({
+                id: node.id || `node_${index}`,
+                type: 'custom',
+                position: node.position || getRandomPosition(),
+                data: {
+                    label: node.data?.label || `Node ${index + 1}`
+                }
+            }));
+
+            const transformedEdges = edgesData.map((edge: any, index: number) => ({
+                ...edge,
+                id: edge.id || `edge_${index}`,
+                label: edge.label || `Connection ${index + 1}`
+            }));
+
+            setNodes(transformedNodes);
+            setEdges(transformedEdges);
+
+            const layouted = getLayoutedElements(transformedNodes, transformedEdges, { direction: layoutDirection });
+            setNodes([...layouted.nodes] as CustomNode[]);
+            setEdges([...layouted.edges] as CustomEdge[]);
+
+            setTimeout(() => {
+                fitView({ padding: 0.2 });
+            }, 50);
+
+        } catch (error) {
+            alert('Invalid JSON');
         }
-    }, []);
+    }, [jsonInput, layoutDirection, setNodes, setEdges, fitView]);
 
     return (
-        <ReactFlow
-            ref={ref}
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onNodeContextMenu={onNodeContextMenu}
-            onConnect={onConnect}
-            onPaneClick={onPaneClick}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            fitView
-            panOnScroll
-            selectionOnDrag
-            proOptions={{ hideAttribution: true }}
-            defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
-        >
-            <Panel position="top-right" className='flex gap-3'>
-                <Button onClick={toggleLayout}>
-                    {layoutDirection === 'TB' ? 'Horizontal' : 'Vertical'}
-                </Button>
-                <Button onClick={addNewNode}>New Node</Button>
-                <Button onClick={clearFlow} variant="destructive">Clear</Button>
-            </Panel>
-            <MiniMap />
-            <Controls />
-            <Background variant={BackgroundVariant.Dots} />
-            {/* @ts-expect-error */}
-            {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
-        </ReactFlow>
+        <div className="flex flex-col h-screen">
+            <Card className="m-4">
+                <CardHeader>
+                    <CardTitle>Flow JSON Input</CardTitle>
+                </CardHeader>
+                <CardContent className="flex gap-2">
+                    <Textarea
+                        placeholder="Paste your JSON here"
+                        value={jsonInput}
+                        onChange={(e) => setJsonInput(e.target.value)}
+                        className="flex-grow"
+                    />
+                    <Button onClick={renderJsonFlow}>Render Flow</Button>
+                </CardContent>
+            </Card>
+            <div className="flex-grow">
+                <ReactFlow
+                    ref={ref}
+                    nodes={nodes}
+                    edges={edges}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    onNodeContextMenu={onNodeContextMenu}
+                    onConnect={onConnect}
+                    onPaneClick={onPaneClick}
+                    nodeTypes={nodeTypes}
+                    edgeTypes={edgeTypes}
+                    fitView
+                    panOnScroll
+                    selectionOnDrag
+                    proOptions={{ hideAttribution: true }}
+                    defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
+                >
+                    <Panel position="top-right" className='flex gap-3'>
+                        <Button onClick={toggleLayout}>
+                            {layoutDirection === 'TB' ? 'Horizontal' : 'Vertical'}
+                        </Button>
+                        <Button onClick={addNewNode}>New Node</Button>
+                        <Button onClick={clearFlow} variant="destructive">Clear</Button>
+                    </Panel>
+                    <MiniMap />
+                    <Controls />
+                    <Background variant={BackgroundVariant.Dots} />
+                    {/* @ts-expect-error */}
+                    {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
+                </ReactFlow>
+            </div>
+        </div>
     );
 }
