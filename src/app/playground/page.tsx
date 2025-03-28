@@ -45,7 +45,7 @@ const Page = () => {
         }}
         className={`${shouldResize ? '' : 'z-50'}`}
       >
-        <Chat setHasInteracted={setHasInteracted} hasInteracted={hasInteracted}/>
+        <Chat setHasInteracted={setHasInteracted}/>
       </div>
 
       {shouldResize && (

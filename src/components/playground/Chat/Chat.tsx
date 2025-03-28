@@ -7,7 +7,7 @@ interface ChatMessage {
     isUser: boolean;
 }
 
-function Chat({ setHasInteracted, hasInteracted }: { setHasInteracted: Dispatch<SetStateAction<boolean>>, hasInteracted: boolean }) {
+function Chat({ setHasInteracted}: { setHasInteracted: Dispatch<SetStateAction<boolean>> }) {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
 
     const handleSendMessage = (content: string) => {
