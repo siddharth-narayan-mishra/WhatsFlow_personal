@@ -24,7 +24,6 @@ const Page = () => {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     if (hasInteracted) {
-      // Add a 1-second delay before resizing
       timeoutId = setTimeout(() => {
         setShouldResize(true);
       }, 1000);
@@ -40,7 +39,6 @@ const Page = () => {
       <div
         style={{
           width: shouldResize ? leftResize.position : '100%',
-          transition: 'width 0.5s ease-in-out',
           height: '100%'
         }}
         className={`${shouldResize ? '' : 'z-50'}`}
@@ -66,7 +64,6 @@ const Page = () => {
           <div
             style={{
               width: rightResize.position,
-              transition: 'width 0.5s ease-in-out',
               height: '100%'
             }}
           >

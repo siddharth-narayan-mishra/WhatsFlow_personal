@@ -1,55 +1,14 @@
-import { wapJSON } from '@/config/wapJSON';
-import React, { useState } from 'react';
-import ChatPreview from './PreviewChat';
-import ScreenSelector from './ScreenSelector';
-import ScreenPreview from './PreviewScreen';
+import { Button } from '@/components/ui/button'
+import React from 'react'
 
 const Preview = () => {
-  const [showPreview, setShowPreview] = useState(false);
-  const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
-
-  const handleStartPreview = () => {
-    setShowPreview(true);
-    setCurrentScreenIndex(0);
-  };
-
-  const handleNextScreen = () => {
-    if (currentScreenIndex < wapJSON.screens.length - 1) {
-      setCurrentScreenIndex(currentScreenIndex + 1);
-    }
-  };
-
-  const handleFinish = () => {
-    setShowPreview(false);
-  };
-
-  const handleBackToChat = () => {
-    setShowPreview(false);
-  };
-
-  const handleSelectScreen = (index: number) => {
-    setCurrentScreenIndex(index);
-  };
-
   return (
-    <div className="p-4 h-screen flex flex-col items-center justify-center text-gray-500 text-xs">
-      <ScreenSelector
-        screens={wapJSON.screens}
-        currentScreenIndex={currentScreenIndex}
-        onSelectScreen={handleSelectScreen}
-      />
-      <div className='h-[458px] w-[256px] relative'>
-        <ChatPreview onStartPreview={handleStartPreview} />
-        {showPreview ?
-          < ScreenPreview
-            screen={wapJSON.screens[currentScreenIndex]}
-            onNext={handleNextScreen}
-            onFinish={handleFinish}
-            onBack={handleBackToChat}
-          /> : ""}
-      </div>
+    <div className='h-screen relative'>
+      <iframe className='w-full h-full' src="https://business.facebook.com/wa/manage/flows/506844115831284/preview/?token=6a8bfc0b-2dc2-40cb-a731-b9dad3c09643">
+      </iframe>
+      <Button className='absolute bottom-12 right-1/2 translate-x-1/2' size="lg">Publish</Button>
     </div>
-  );
-};
+  )
+}
 
-export default Preview;
+export default Preview
