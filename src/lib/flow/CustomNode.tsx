@@ -1,11 +1,37 @@
 import { memo, useState, useCallback, useRef, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import { Handle, Position, NodeResizer, useReactFlow } from '@xyflow/react';
 
-const CustomNode = ({ data, selected, id }: { data: { label: string }, selected: boolean, id: string }) => {
+// Update the type definition to include style and placeholder
+type CustomNodeData = {
+    label: string;
+    placeholder?: string;
+    style?: React.CSSProperties;
+};
+
+const CustomNode = ({ data, selected, id }: { data: CustomNodeData, selected: boolean, id: string }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [labelText, setLabelText] = useState(data.label);
     const inputRef = useRef<HTMLInputElement>(null);
     const { setNodes } = useReactFlow();
+
+    // Default styles that will be overridden by any provided styles
+    const defaultStyle = {
+        paddingInline: 10,
+        paddingBlock: 5,
+        backgroundColor: 'white',
+        borderRadius: '10px',
+        border: "gray 1px solid",
+        height: "100%",
+        display: 'flex',
+        justifyContent: "center",
+        alignItems: "center"
+    };
+
+    // Combine default styles with any custom styles from the data
+    const nodeStyle = {
+        ...defaultStyle,
+        ...data.style
+    };
 
     useEffect(() => {
         if (isEditing && inputRef.current) {
@@ -13,6 +39,11 @@ const CustomNode = ({ data, selected, id }: { data: { label: string }, selected:
             inputRef.current.select();
         }
     }, [isEditing]);
+
+    useEffect(() => {
+        // Update label text if data.label changes
+        setLabelText(data.label);
+    }, [data.label]);
 
     const handleLabelClick = useCallback(() => {
         setIsEditing(true);
@@ -64,18 +95,7 @@ const CustomNode = ({ data, selected, id }: { data: { label: string }, selected:
                 color='black'
             />
             <Handle type="target" position={Position.Top} />
-            <div
-                style={{
-                    paddingInline: 10,
-                    paddingBlock: 5,
-                    backgroundColor: 'white',
-                    borderRadius: '10px',
-                    border: "gray 1px solid",
-                    height: "100%",
-                    display: 'flex',
-                    justifyContent: "center",
-                    alignItems: "center"
-                }}>
+            <div style={nodeStyle}>
                 {isEditing ? (
                     <input
                         ref={inputRef}
@@ -83,6 +103,7 @@ const CustomNode = ({ data, selected, id }: { data: { label: string }, selected:
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         onKeyDown={handleKeyDown}
+                        placeholder={data.placeholder}
                         style={{
                             border: 'none',
                             background: 'transparent',
@@ -91,7 +112,10 @@ const CustomNode = ({ data, selected, id }: { data: { label: string }, selected:
                             fontFamily: 'inherit',
                             color: 'inherit',
                             textAlign: "center",
-                            width: labelText.length * 9.2, display: 'flex', justifyContent: "center", alignItems: "center",
+                            width: labelText.length * 9.2,
+                            display: 'flex',
+                            justifyContent: "center",
+                            alignItems: "center",
                         }}
                     />
                 ) : (

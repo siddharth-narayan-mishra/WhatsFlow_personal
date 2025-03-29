@@ -5,7 +5,7 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], options: { dir
     if (nodes.length === 0) return { nodes, edges };
 
     const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-    g.setGraph({ rankdir: options.direction });
+    g.setGraph({ rankdir: options.direction, align:"DL" });
 
     edges.forEach((edge) => g.setEdge(edge.source, edge.target));
     nodes.forEach((node) =>

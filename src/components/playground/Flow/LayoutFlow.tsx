@@ -27,6 +27,8 @@ import {
 type CustomNode = Node & {
     data: {
         label: string;
+        placeholder?: string;
+        style?: React.CSSProperties;
     };
 };
 
@@ -175,7 +177,9 @@ export default function LayoutFlow() {
                 type: 'custom',
                 position: node.position || getRandomPosition(),
                 data: {
-                    label: node.data?.label || `Node ${index + 1}`
+                    label: node.data?.label || `Node ${index + 1}`,
+                    placeholder: node.data?.placeholder,
+                    style: node.data?.style || {}
                 }
             }));
 
