@@ -24,10 +24,9 @@ const CustomNode = ({ data, selected, id }: { data: CustomNodeData, selected: bo
         height: "100%",
         display: 'flex',
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
     };
 
-    // Combine default styles with any custom styles from the data
     const nodeStyle = {
         ...defaultStyle,
         ...data.style
@@ -41,7 +40,6 @@ const CustomNode = ({ data, selected, id }: { data: CustomNodeData, selected: bo
     }, [isEditing]);
 
     useEffect(() => {
-        // Update label text if data.label changes
         setLabelText(data.label);
     }, [data.label]);
 

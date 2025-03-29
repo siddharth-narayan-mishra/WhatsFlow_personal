@@ -59,7 +59,7 @@ export default function LayoutFlow() {
                 }
 
                 if (savedNodes && savedNodes.length > 0) {
-                    setTimeout(() => {
+                    setTimeout(async() => {
                         const layouted = getLayoutedElements(savedNodes, savedEdges, { direction: layoutDirection });
                         setNodes([...layouted.nodes] as CustomNode[]);
                         setEdges([...layouted.edges] as CustomEdge[]);
@@ -96,10 +96,10 @@ export default function LayoutFlow() {
         [edges, setEdges],
     );
 
-    const onLayout = useCallback((direction: 'TB' | 'LR') => {
+    const onLayout = useCallback(async(direction: 'TB' | 'LR') => {
         setLayoutDirection(direction);
 
-        const layouted = getLayoutedElements(nodes, edges, { direction });
+        const layouted = await getLayoutedElements(nodes, edges, { direction });
         setNodes([...layouted.nodes] as CustomNode[]);
         setEdges([...layouted.edges] as CustomEdge[]);
 
@@ -166,7 +166,7 @@ export default function LayoutFlow() {
 
     const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
 
-    const renderJsonFlow = useCallback(() => {
+    const renderJsonFlow = useCallback(async() => {
         try {
             const parsedData = JSON.parse(jsonInput);
             const nodesData = parsedData.nodes || [];
@@ -192,7 +192,7 @@ export default function LayoutFlow() {
             setNodes(transformedNodes);
             setEdges(transformedEdges);
 
-            const layouted = getLayoutedElements(transformedNodes, transformedEdges, { direction: layoutDirection });
+            const layouted = await getLayoutedElements(transformedNodes, transformedEdges, { direction: layoutDirection });
             setNodes([...layouted.nodes] as CustomNode[]);
             setEdges([...layouted.edges] as CustomEdge[]);
 
