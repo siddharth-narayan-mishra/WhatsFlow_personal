@@ -17,7 +17,7 @@ function ChatInput({ onSendMessage }: ChatInputProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="relative">
+        <form onSubmit={handleSubmit} className="relative w-full">
             <input
                 type="text"
                 value={message}
