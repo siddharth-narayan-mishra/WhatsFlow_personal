@@ -24,7 +24,7 @@ import {
     Edge,
 } from '@xyflow/react';
 
-type CustomNode = Node & {
+export type CustomNode = Node & {
     data: {
         label: string;
         placeholder?: string;
@@ -32,11 +32,11 @@ type CustomNode = Node & {
     };
 };
 
-type CustomEdge = Edge & {
+export type CustomEdge = Edge & {
     label?: string;
 };
 
-export default function LayoutFlow() {
+export default function LayoutFlow({ flowData }: { flowData: { nodes: CustomNode[], edges: CustomEdge[] } }) {
     const { fitView } = useReactFlow();
     const [nodes, setNodes, onNodesChange] = useNodesState<CustomNode>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<CustomEdge>([]);
@@ -47,35 +47,29 @@ export default function LayoutFlow() {
     const isInitialRender = useRef(true);
 
     useEffect(() => {
-        try {
-            const savedData = localStorage.getItem('flowData');
-            if (savedData) {
-                const { nodes: savedNodes, edges: savedEdges } = JSON.parse(savedData);
-                if (savedNodes && Array.isArray(savedNodes)) {
-                    setNodes(savedNodes as CustomNode[]);
-                }
-                if (savedEdges && Array.isArray(savedEdges)) {
-                    setEdges(savedEdges as CustomEdge[]);
-                }
+        const { nodes: savedNodes, edges: savedEdges } = flowData||{nodes:[],edges:[]};
 
-                if (savedNodes && savedNodes.length > 0) {
-                    setTimeout(async() => {
-                        const layouted = getLayoutedElements(savedNodes, savedEdges, { direction: layoutDirection });
-                        setNodes([...layouted.nodes] as CustomNode[]);
-                        setEdges([...layouted.edges] as CustomEdge[]);
+        if (savedNodes && Array.isArray(savedNodes)) {
+            setNodes(savedNodes as CustomNode[]);
+        }
+        if (savedEdges && Array.isArray(savedEdges)) {
+            setEdges(savedEdges as CustomEdge[]);
+        }
 
-                        setTimeout(() => {
-                            fitView({ padding: 0.2 });
-                        }, 50);
-                    }, 300);
-                }
-            }
-        } catch (error) {
-            console.error("Failed to load from localStorage:", error);
+        if (savedNodes && savedNodes.length > 0) {
+            setTimeout(async () => {
+                const layouted = getLayoutedElements(savedNodes, savedEdges, { direction: layoutDirection });
+                setNodes([...layouted.nodes] as CustomNode[]);
+                setEdges([...layouted.edges] as CustomEdge[]);
+
+                setTimeout(() => {
+                    fitView({ padding: 0.2 });
+                }, 50);
+            }, 300);
         }
 
         isInitialRender.current = false;
-    }, []);
+    }, [flowData]);
 
     useEffect(() => {
         if (!isInitialRender.current) {
@@ -96,7 +90,7 @@ export default function LayoutFlow() {
         [edges, setEdges],
     );
 
-    const onLayout = useCallback(async(direction: 'TB' | 'LR') => {
+    const onLayout = useCallback(async (direction: 'TB' | 'LR') => {
         setLayoutDirection(direction);
 
         const layouted = await getLayoutedElements(nodes, edges, { direction });
@@ -166,7 +160,7 @@ export default function LayoutFlow() {
 
     const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
 
-    const renderJsonFlow = useCallback(async() => {
+    const renderJsonFlow = useCallback(async () => {
         try {
             const parsedData = JSON.parse(jsonInput);
             const nodesData = parsedData.nodes || [];

@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, Bot } from 'lucide-react';
+import ReactMarkdown from "react-markdown";
 
 interface MessageProps {
     content: string;
@@ -17,9 +18,11 @@ function Message({ content, isUser }: MessageProps) {
                     <Bot className="w-5 h-5 text-black" />
                 )}
             </div>
-            <div className={`flex-1 px-4 py-3 rounded-lg ${isUser ? 'bg-[#dcf8c6] text-black' : 'bg-gray-100 text-gray-800'
+            <div className={`flex-1 px-4 py-3 rounded-lg text-sm ${isUser ? 'bg-[#dcf8c6] text-black' : 'bg-gray-100 text-gray-800'
                 }`}>
-                <p className="text-sm">{content}</p>
+                <ReactMarkdown>
+                    {content}
+                </ReactMarkdown>
             </div>
         </div>
     );

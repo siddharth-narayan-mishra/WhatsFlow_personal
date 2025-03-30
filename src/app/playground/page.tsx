@@ -8,6 +8,12 @@ import { useResizable } from "react-resizable-layout";
 const Page = () => {
   const [hasInteracted, setHasInteracted] = useState(false);
   const [shouldResize, setShouldResize] = useState(false);
+  const [flowJSON, setFlowJSON] = useState<any>();
+  const [previewURL,setPreviewURL] = useState("")
+
+  useEffect(() => {
+    console.log("flowJSON = ", flowJSON)
+  }, [flowJSON])
 
   const leftResize = useResizable({
     axis: 'x',
@@ -43,7 +49,7 @@ const Page = () => {
         }}
         className={`${shouldResize ? '' : 'z-50'}`}
       >
-        <Chat setHasInteracted={setHasInteracted}/>
+        <Chat setHasInteracted={setHasInteracted} setFlowJSON={setFlowJSON} interacted={hasInteracted} setPreviewUrl={setPreviewURL}/>
       </div>
 
       {shouldResize && (
@@ -54,7 +60,7 @@ const Page = () => {
             className='w-1 shadow-sm bg-gray-200 hover:bg-blue-400 active:bg-blue-600 cursor-col-resize relative z-10 transition-all duration-500'
           ></div>
           <div style={{ flex: 1, transition: 'all 0.5s ease-in-out' }}>
-            <Flow />
+            <Flow flowData={flowJSON} />
           </div>
           <div
             id="right-separator"
@@ -67,7 +73,7 @@ const Page = () => {
               height: '100%'
             }}
           >
-            <Preview />
+            <Preview preview_url={previewURL} />
           </div>
         </>
       )}
