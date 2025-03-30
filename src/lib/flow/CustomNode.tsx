@@ -18,7 +18,7 @@ const CustomNode = ({ data, selected, id }: { data: CustomNodeData, selected: bo
     const defaultStyle = {
         paddingInline: 10,
         paddingBlock: 5,
-        backgroundColor: 'white',
+        background: 'white',
         borderRadius: '10px',
         border: "gray 1px solid",
         height: "100%",

@@ -1,31 +1,43 @@
-// app/api/flow/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { v4 as uuidv4 } from 'uuid';
 
 // Base URLs for API endpoints
-const PYTHON_API_BASE_URL = process.env.PYTHON_API_BASE_URL || 'http://0.0.0.0:5000';
-const FB_API_BASE_URL = process.env.FB_API_BASE_URL || 'https://graph.facebook.com/v18.0';
+const PYTHON_API_BASE_URL = process.env.PYTHON_API_BASE_URL
+const FB_API_BASE_URL = process.env.FB_API_BASE_URL
 
 // Facebook API credentials
-const WABA_ID = process.env.WABA_ID || '538735706000918';
-const FB_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN || 'EAA2xTUIuNRsBOZBwAuJdVX1q7qxz7ToSWlOhLXDjC6xmTgJ9ZBiZCsYXq3biegb0D9fevUdTbZBfQDJJoJk0uiq601ept0USZA2I2jt16fA1brXD9T7ffcpnRCGMElw8ngtIXu5t84L5CMZCpZCYJXEuXPW6awIQhZByEKa258fvr5yBK1pvkA8HtXDspCDgFZAnfvwZDZD';
+const WABA_ID = process.env.WABA_ID
+const FB_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
         const { thread_id } = body;
-        console.log("Thread ID = ", thread_id)
+        console.log("Thread ID = ", thread_id);
 
         if (!thread_id) {
             return NextResponse.json({ error: 'Thread ID is required' }, { status: 400 });
         }
 
-        const backendRequestBody = JSON.stringify({ thread_id: thread_id, query: "make flow" })
+        const requestBody = JSON.stringify({ thread_id: thread_id, query: "make flow" });
 
-        // Step 1: Get flows from the Python backend
+        const planResponse = await fetch(`${PYTHON_API_BASE_URL}/plan`, {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: requestBody
+        });
+
+        if (!planResponse.ok) {
+            throw new Error(`Failed to create plan: ${planResponse.statusText}`);
+        }
+
+        const planResult = await planResponse.json();
+        console.log("Plan created successfully:", planResult);
+
         const flowResponse = await fetch(`${PYTHON_API_BASE_URL}/get_flows`, {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
-            body: backendRequestBody
+            body: requestBody
         });
 
         if (!flowResponse.ok) {
@@ -35,14 +47,15 @@ export async function POST(request: NextRequest) {
         const flowResult = await flowResponse.json();
         console.log("Flow result from Python backend:", flowResult);
 
-        // Step 2: Create flow in Facebook API
+
         const fbHeaders = new Headers();
         fbHeaders.append("Content-Type", "application/json");
+        fbHeaders.append("Authorization", `Bearer ${FB_ACCESS_TOKEN}`);
 
         const fbRequestBody = JSON.stringify({
-            "name": thread_id, // Use UUID as name
+            "name": uuidv4(),
             "categories": ["OTHER"],
-            "flow_json": flowResult.wap_json, // Use wap_json from the Python backend
+            "flow_json": flowResult.wap_json,
             "publish": false
         });
 
@@ -86,13 +99,14 @@ export async function POST(request: NextRequest) {
         const previewResult = await previewResponse.json();
         console.log("Preview result:", previewResult);
 
-        // Return all required data to the frontend
+        // Return all required data to the frontend, including flow_plan
         return NextResponse.json({
             success: true,
             threadId: thread_id,
             flowId: fbResult.id,
             reactJson: flowResult.react_json,
-            previewUrl: previewResult.preview?.preview_url || null
+            previewUrl: previewResult.preview?.preview_url || null,
+            flowPlan: planResult.flow_plan || null // Including the flow_plan in the response
         });
 
     } catch (error) {

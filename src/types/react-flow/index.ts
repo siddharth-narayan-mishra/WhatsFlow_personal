@@ -9,7 +9,8 @@ export interface CustomNodeData {
 }
 
 export const nodeTypes = {
-    custom: CustomNode
+    custom: CustomNode,
+    default: CustomNode
 };
 
 export const edgeTypes = {

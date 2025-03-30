@@ -32,6 +32,7 @@ function Chat({
     }, [interacted]);
 
     const handleSendMessage = async (content: string) => {
+
         // Get existing thread_id from localStorage or create a new one if it doesn't exist
         let thread_id = localStorage.getItem("thread_id");
 
@@ -105,6 +106,16 @@ function Chat({
                 localStorage.setItem("flow_id", result.flowId);
             }
 
+            setMessages(prevMessages => [
+                ...prevMessages,
+                { content: result.flowPlan, isUser: false }
+            ]);
+
+            setMessages(prevMessages => [
+                ...prevMessages,
+                { content: "You can view the preview at:\n"+result.previewUrl, isUser: false }
+            ]);
+
         } catch (error) {
             console.error("Error generating flow:", error);
         } finally {
@@ -137,16 +148,17 @@ function Chat({
         <div className="relative flex flex-col h-screen bg-[#ece5dd]">
 
             {/* Header */}
-            <div className={`flex justify-center gap-2 items-center ${messages.length === 0 ? 'text-4xl mt-4' : 'p-2'}`}>
-                <MessageCircleIcon className={`text-primary ${messages.length === 0 ? 'scale-150' : 'scale-125'}`} />
-                <h1 className='text-primary font-bold'>WhatsFlow</h1>
+            <div className={`flex items-center ${messages.length === 0 ? 'text-4xl mt-4 justify-center' : 'p-2 justify-between'}`}>
+                <div className='flex gap-2 items-center'>
+                    <MessageCircleIcon className={`text-primary ${messages.length === 0 ? 'scale-150' : 'scale-125'}`} />
+                    <h1 className='text-primary font-bold'>WhatsFlow</h1>
+                </div>
 
                 {/* New Thread Button - only show if there are messages */}
                 {messages.length > 0 && (
                     <Button
-                        variant="ghost"
                         size="sm"
-                        className="absolute right-4 flex items-center gap-1"
+                        className='cursor-pointer'
                         onClick={startNewThread}
                     >
                         <PlusCircleIcon className="h-4 w-4" />
